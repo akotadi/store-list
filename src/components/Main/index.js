@@ -1,9 +1,5 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import Container from '@material-ui/core/Container';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
 
@@ -23,6 +19,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
+import { useStore, addProduct, updateProduct, deleteProduct } from './../../Store';
 import products_json from "./../../mockData.json";
 
 const tableIcons = {
@@ -63,14 +60,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     columns: [
-      { title: 'Name', field: 'name' },
-      { title: 'Description', field: 'description' },
-      { title: 'Price', field: 'price', type: 'numeric' },
+      { title: 'Id', field: 'id', editable: 'never' },
+      { title: 'Name', field: 'name', editable: 'never' },
+      { title: 'Description', field: 'description', editable: 'never' },
+      { title: 'Price', field: 'price', type: 'numeric', editable: 'onUpdate' },
     ],
-    data: products_json.Products,
   });
+  const { products, setProducts } = useStore()
 
   const classes = useStyles();
 
@@ -80,94 +78,38 @@ export default function Main() {
       <MaterialTable
         title="Products"
         columns={state.columns}
-        data={state.data}
+        data={products}
         icons={tableIcons}
         editable={{
           onRowAdd: (newData) =>
             new Promise((resolve) => {
               setTimeout(() => {
                 resolve();
-                setState((prevState) => {
-                  const data = [...prevState.data];
-                  data.push(newData);
-                  return { ...prevState, data };
-                });
+                addProduct(newData.name, newData.description, newData.price);
               }, 600);
             }),
-          onRowUpdate: (newData, oldData) =>
-            new Promise((resolve) => {
-              setTimeout(() => {
-                resolve();
-                if (oldData) {
-                  setState((prevState) => {
-                    const data = [...prevState.data];
-                    data[data.indexOf(oldData)] = newData;
-                    return { ...prevState, data };
-                  });
-                }
-              }, 600);
-            }),
-          onRowDelete: (oldData) =>
-            new Promise((resolve) => {
-              setTimeout(() => {
-                resolve();
-                setState((prevState) => {
-                  const data = [...prevState.data];
-                  data.splice(data.indexOf(oldData), 1);
-                  return { ...prevState, data };
-                });
-              }, 600);
-            }),
+            onRowUpdate: (newData, oldData) =>
+              new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve();
+                  if (oldData) {
+                    products[products.indexOf(oldData)] = newData;
+                    setProducts(products);
+                    updateProduct(oldData.id, newData.name, newData.description, newData.price);
+                  }
+                }, 600);
+              }),
+            onRowDelete: (oldData) =>
+              new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve();
+                  setProducts(products.splice(products.indexOf(oldData), 1))
+                  deleteProduct(oldData.id);
+                }, 600);
+              }),
         }}
       />
     </Container>
-    {/* <Container className={classes.formContainer}>
-      <Typography component="h1" variant="h5">
-        Nuevo Producto
-      </Typography>
-      <form className={classes.form} noValidate>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="name"
-          label="Name"
-          name="name"
-          autoFocus
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          id="description"
-          label="Description"
-          name="description"
-          autoFocus
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="price"
-          label="Price"
-          id="price"
-          InputProps={{
-            startAdornment: <InputAdornment position="start">$</InputAdornment>,
-          }}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          Añadir
-        </Button>
-      </form>
-    </Container> */}
     </main>
   )
 }
