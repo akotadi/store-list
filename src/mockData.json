@@ -1,0 +1,58 @@
+{
+    "Products": [
+        {
+            "id": "1",
+            "name": "Nupec adulto",
+            "description": "",
+            "price": 60.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        },
+        {
+            "id": "2",
+            "name": "Nupec cachorro",
+            "description": "",
+            "price": 70.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        },
+        {
+            "id": "3",
+            "name": "Ganador adulto",
+            "description": "",
+            "price": 36.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        },
+        {
+            "id": "4",
+            "name": "Ganador cachorro",
+            "description": "",
+            "price": 40.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        },
+        {
+            "id": "5",
+            "name": "Ganador adulto premium",
+            "description": "",
+            "price": 42.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        },
+        {
+            "id": "6",
+            "name": "Ganador cachorro premium",
+            "description": "",
+            "price": 45.00,
+            "tags": ["abarrotes"],
+            "inserted_at": 1561881986756,
+            "updated_at": 1561881986756
+        }
+    ]
+}
