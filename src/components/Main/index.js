@@ -68,7 +68,12 @@ export default function Main() {
       { title: 'Price', field: 'price', type: 'numeric', editable: 'onUpdate' },
     ],
   });
-  const { products, setProducts } = useStore()
+  const { products, setProducts } = useStore();
+  if(!navigator.onLine){
+    setProducts(localStorage.getItem('Products'));
+  }else{
+    localStorage.setItem('Products', products);
+  }
 
   const classes = useStyles();
 
