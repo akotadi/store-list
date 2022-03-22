@@ -8,6 +8,7 @@ const supabase = createClient(
 
 export const useStore = () => {
   const [products, setProducts] = useState([])
+  // eslint-disable-next-line no-unused-vars
   const [newProduct, handleNewProduct] = useState()
 
   useEffect(() => {
@@ -50,6 +51,7 @@ export const useStore = () => {
       }
     }
     handleAsync()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newProduct])
 
   return { products, setProducts }
