@@ -12,11 +12,15 @@ export const useStore = () => {
   const [newProduct, handleNewProduct] = useState()
 
   useEffect(() => {
-    fetchList()
-      .then((response) => {
-        setProducts(response)
-      })
-      .catch(console.error)
+    if(!navigator.onLine){
+      setProducts(localStorage.getItem('Products'));
+    }else{
+      fetchList()
+        .then((response) => {
+          setProducts(response)
+        })
+        .catch(console.error);
+    }
 
     // TODO: Fix this shit
     const subscription = supabase

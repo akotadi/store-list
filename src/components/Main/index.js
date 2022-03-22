@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
@@ -113,11 +113,10 @@ export default function Main() {
       { title: 'Precio', field: 'price', type: 'currency', editable: 'always' },
     ];
   const { products, setProducts } = useStore();
-  if(!navigator.onLine){
-    setProducts(localStorage.getItem('Products'));
-  }else{
+
+  useEffect(() => {
     localStorage.setItem('Products', products);
-  }
+  }, [products])
 
   const classes = useStyles();
 
