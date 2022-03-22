@@ -26,7 +26,7 @@ export default function Header() {
       <Toolbar>
         <img className={classes.navIcon} src="./assets/layout/images/Logo-cremeria.svg" alt="Cremería Gustavo"/>
         <Typography variant="h6" className={classes.navText} noWrap>
-          Price List
+          Lista de Precios
         </Typography>
       </Toolbar>
     </AppBar>

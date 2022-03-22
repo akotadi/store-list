@@ -14,6 +14,9 @@ const styles = makeStyles((theme) =>
         },
         footer: {
           paddingTop: `${theme.spacing(1) * 5}px`,
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
         },
         whiteText: {
           color: '#fff'

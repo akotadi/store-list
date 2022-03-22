@@ -20,6 +20,21 @@ const theme = createMuiTheme({
       root: 'rgba(0, 0, 0, 0.54)',
     },
   },
+  typography: {
+    fontFamily: ['Inter', 'Lato', 'Roboto', 'Open Sans'].join(','),
+    fontWeightLight: 300,
+    fontWeightRegular: 400,
+    fontWeightMedium: 700,
+    fontWeightBold: 900,
+  },
+  shade: {
+    light: '0 10px 15px -5px rgba(62, 57, 107, .07)',
+  },
+  rounded: {
+    small: '8px',
+    medium: '12px',
+    big: '20px',
+  },
 });
 
 export default theme;

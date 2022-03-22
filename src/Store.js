@@ -9,7 +9,6 @@ const supabase = createClient(
 export const useStore = () => {
   const [products, setProducts] = useState([])
   const [newProduct, handleNewProduct] = useState()
-  const [productListener, setProductListener] = useState(null)
 
   useEffect(() => {
     fetchList()
@@ -17,9 +16,20 @@ export const useStore = () => {
         setProducts(response)
       })
       .catch(console.error)
-  })
+
+    // TODO: Fix this shit
+    const subscription = supabase
+      .from('products')
+      .on('*', payload => {console.log('aaa1'); console.log(payload);})
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    }
+  }, [])
 
   useEffect(() => {
+    console.log('new product');
     const handleAsync = async () => {
       if (newProduct) {
         // could be an update
@@ -42,25 +52,23 @@ export const useStore = () => {
     handleAsync()
   }, [newProduct])
 
-  useEffect(() => {
-    if (!productListener) {
-      setProductListener(
-        supabase
-          .from(`products`)
-          .on('INSERT', (payload) => handleNewProduct(payload.new))
-          .on('UPDATE', (payload) => handleNewProduct(payload.new))
-          .subscribe()
-      )
-    }
-  }, [productListener])
-
   return { products, setProducts }
 }
 
 export const addProduct = async (name, description, price) => {
   try {
-    let { body } = await supabase.from('products').insert([{ name, description, price }])
-    return body
+    const { data, error } = await supabase
+      .from('products')
+      .upsert([
+        { name, description, price },
+      ]);
+    
+    if(error) {
+      console.error(error);
+      return;
+    }
+    
+    return data;
   } catch (error) {
     console.log('error', error)
   }
@@ -68,17 +76,35 @@ export const addProduct = async (name, description, price) => {
 
 export const updateProduct = async (product_id, name, description, price) => {
   try {
-    let { body } = await supabase.from('products').eq('id', product_id).update(name, description, price)
-    return body
+    const { data, error } = await supabase
+      .from('products')
+      .update({ name, description, price })
+      .eq('id', product_id);
+    
+    if(error) {
+      console.error(error);
+      return;
+    }
+    
+    return data;
   } catch (error) {
     console.log('error', error)
   }
 }
 
-export const deleteProduct = async (product_id, values) => {
+export const deleteProduct = async (product_id) => {
   try {
-    let { body } = await supabase.from('products').eq('id', product_id).delete()
-    return body
+    const { data, error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', product_id);
+    
+    if(error) {
+      console.error(error);
+      return;
+    }
+    
+    return data;
   } catch (error) {
     console.log('error', error)
   }
@@ -86,11 +112,17 @@ export const deleteProduct = async (product_id, values) => {
 
 export const fetchList = async () => {
   try {
-    let { body } = await supabase
+    const { data: products, error } = await supabase
       .from('products')
-      .select(`*`)
-    return body
+      .select('*');
+    
+    if(error) {
+      console.error(error);
+      return;
+    }
+    
+    return products;
   } catch (error) {
-    console.log('error', error)
+    console.error('error', error)
   }
 }

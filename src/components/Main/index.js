@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef } from 'react';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
@@ -20,7 +20,6 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
 import { useStore, addProduct, updateProduct, deleteProduct } from './../../Store';
-import products_json from "./../../mockData.json";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -42,6 +41,53 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
+const localization = {
+  body: {
+    emptyDataSourceMessage: "No hay productos qué mostrar",
+    addTooltip: 'Añadir',
+    deleteTooltip: 'Eliminar',
+    editTooltip: 'Editar',
+    filterRow: {
+      filterTooltip: 'Filtrar'
+    },
+    editRow: {
+      deleteText: '¿Estás segur@ que quieres eliminar este producto?',
+      cancelTooltip: 'Cancelar',
+      saveTooltip: 'Finalizar'
+    }
+},
+grouping: {
+  groupedBy: 'Agrupar por:'
+},
+header: {
+  actions: 'Acciones'
+},
+pagination: {
+  labelDisplayedRows: '{from}-{to} de {count}',
+  labelRowsSelect: 'filas',
+  labelRowsPerPage: 'Filas por página:',
+  firstAriaLabel: 'Primer página',
+  firstTooltip: 'Primer página',
+  previousAriaLabel: 'Página anterior',
+  previousTooltip: 'Página anterior',
+  nextAriaLabel: 'Página siguiente',
+  nextTooltip: 'Página siguiente',
+  lastAriaLabel: 'Última página',
+  lastTooltip: 'Última página'
+},
+toolbar: {
+  addRemoveColumns: 'Añadir o eliminar columnas',
+  nRowsSelected: '{0} fila(s) seleccionada(s)',
+  showColumnsTitle: 'Mostrar columnas',
+  showColumnsAriaLabel: 'Mostrar columnas',
+  exportTitle: 'Exportar',
+  exportAriaLabel: 'Exportar',
+  exportName: 'Exportar en CSV',
+  searchTooltip: 'Buscar',
+  searchPlaceholder: 'Buscar'
+}
+}
+
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
     paddingTop: `${theme.spacing(1) * 5}px`,
@@ -60,14 +106,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-  const [state, setState] = useState({
-    columns: [
-      { title: 'Id', field: 'id', editable: 'never' },
-      { title: 'Name', field: 'name', editable: 'never' },
-      { title: 'Description', field: 'description', editable: 'never' },
-      { title: 'Price', field: 'price', type: 'numeric', editable: 'onUpdate' },
-    ],
-  });
+  const columns = [
+      { title: 'Id', field: 'id', type: 'numeric', editable: 'never', align: 'left' },
+      { title: 'Nombre', field: 'name', editable: 'always', searcheable: true },
+      { title: 'Descripción', field: 'description', editable: 'always' },
+      { title: 'Precio', field: 'price', type: 'currency', editable: 'always' },
+    ];
   const { products, setProducts } = useStore();
   if(!navigator.onLine){
     setProducts(localStorage.getItem('Products'));
@@ -81,35 +125,59 @@ export default function Main() {
     <main>
     <Container className={classes.tableContainer}>
       <MaterialTable
-        title="Products"
-        columns={state.columns}
+        title="Productos"
+        columns={columns}
         data={products}
         icons={tableIcons}
+        localization={localization}
+        options={{
+          paging: false,
+          maxBodyHeight: '65vh',
+          actionsColumnIndex: -1
+        }}
         editable={{
           onRowAdd: (newData) =>
             new Promise((resolve) => {
               setTimeout(() => {
+                addProduct(newData.name, newData.description, newData.price).then(products => 
+                    products.forEach(product => 
+                      setProducts(prev => 
+                        [...prev, product]
+                      )
+                    )
+                  );
                 resolve();
-                addProduct(newData.name, newData.description, newData.price);
               }, 600);
             }),
             onRowUpdate: (newData, oldData) =>
               new Promise((resolve) => {
                 setTimeout(() => {
-                  resolve();
                   if (oldData) {
-                    products[products.indexOf(oldData)] = newData;
-                    setProducts(products);
-                    updateProduct(oldData.id, newData.name, newData.description, newData.price);
+                    updateProduct(oldData.id, newData.name, newData.description, newData.price).then(products => 
+                      products.forEach(product => 
+                        setProducts(prev => {
+                          prev[prev.indexOf(oldData)] = product;
+                          return prev;
+                        })
+                      )
+                    )
                   }
+                  resolve();
                 }, 600);
               }),
             onRowDelete: (oldData) =>
               new Promise((resolve) => {
                 setTimeout(() => {
+                  deleteProduct(oldData.id).then(products => 
+                    products.forEach(product => 
+                      setProducts(prev => 
+                        prev.filter(value => 
+                          value.id !== product.id
+                        )
+                      )
+                    )
+                  );
                   resolve();
-                  setProducts(products.splice(products.indexOf(oldData), 1))
-                  deleteProduct(oldData.id);
                 }, 600);
               }),
         }}
