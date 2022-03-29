@@ -19,7 +19,7 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
-import { useStore, addProduct, updateProduct, deleteProduct } from './../../Store';
+import { useStore, createProduct, addProduct, updateProduct, deleteProduct } from './../../Store';
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -112,10 +112,10 @@ export default function Main() {
       { title: 'Descripción', field: 'description', editable: 'always' },
       { title: 'Precio', field: 'price', type: 'currency', editable: 'always' },
     ];
-  const { products } = useStore();
+  const { products, setProducts } = useStore();
 
   useEffect(() => {
-    localStorage.setItem('Products', products);
+    localStorage.setItem('Products', JSON.stringify(products));
   }, [products])
 
   const classes = useStyles();
@@ -138,7 +138,12 @@ export default function Main() {
           onRowAdd: (newData) =>
             new Promise((resolve) => {
               setTimeout(() => {
-                addProduct(newData.name, newData.description, newData.price);
+                if(!navigator.onLine){
+                  const newProduct = createProduct(newData.name, newData.description, newData.price);
+                  setProducts((prev) => [...prev, newProduct]);
+                }else{
+                  addProduct(newData.name, newData.description, newData.price).then(product => console.log(product));
+                }
                 resolve();
               }, 600);
             }),
@@ -146,7 +151,12 @@ export default function Main() {
               new Promise((resolve) => {
                 setTimeout(() => {
                   if (oldData) {
-                    updateProduct(oldData.id, newData.name, newData.description, newData.price);
+                    if(!navigator.onLine){
+                      const newProduct = createProduct(newData.name, newData.description, newData.price, oldData.id);
+                      setProducts((prev) => prev.map(product => product.id === oldData.id ? newProduct : product));
+                    }else{
+                      updateProduct(oldData.id, newData.name, newData.description, newData.price).then(product => console.log(product));
+                    }
                   }
                   resolve();
                 }, 600);
@@ -154,7 +164,11 @@ export default function Main() {
             onRowDelete: (oldData) =>
               new Promise((resolve) => {
                 setTimeout(() => {
-                  deleteProduct(oldData.id);
+                  if(!navigator.onLine){
+                    setProducts(setProducts((prev) => prev.filter(product => product.id !== oldData.id)));
+                  }else{
+                    deleteProduct(oldData.id);
+                  }
                   resolve();
                 }, 600);
               }),

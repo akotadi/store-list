@@ -30,28 +30,48 @@ export const useStore = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetchList()
-      .then((response) => {
-        setProducts(response ?? []);
-      })
-      .catch(console.error)
-      .finally(setLoading(false));
-    
-    const productsListener = supabase
-      .from(`products`)
-      .on('INSERT', handleProductInserted)
-      .on('UPDATE', handleProductUpdated)
-      .on('DELETE', handleProductDeleted)
-      .subscribe();
+    if(!navigator.onLine){
+      // TODO: Update to sync with supabase
+      setProducts(JSON.parse(localStorage.getItem('Products')) ?? []);
+    }else{
+      fetchList()
+        .then((response) => {
+          setProducts(response ?? []);
+        })
+        .catch(console.error)
+        .finally(setLoading(false));
+      
+      const productsListener = supabase
+        .from(`products`)
+        .on('INSERT', handleProductInserted)
+        .on('UPDATE', handleProductUpdated)
+        .on('DELETE', handleProductDeleted)
+        .subscribe();
 
+      return () => {
+        productsListener.unsubscribe();
+      };
+    }
     setLoading(false);
-
-    return () => {
-      productsListener.unsubscribe();
-    };
   }, []);
 
   return { products, setProducts, loading, setLoading }
+}
+
+export const createProduct = (name, description, price, id = 0) => {
+  const currentTime = (new Date()).toISOString();
+
+  const newProduct = {
+    id,
+    name,
+    description,
+    price,
+    tags: null,
+    created_at: currentTime,
+    updated_at: currentTime,
+  }
+
+  return newProduct;
 }
 
 export const addProduct = async (name, description, price) => {
