@@ -24,7 +24,7 @@ export default function Header() {
   return (
     <AppBar position="relative">
       <Toolbar>
-        <img className={classes.navIcon} src="./assets/layout/images/Logo-cremeria.svg" alt="Cremería Gustavo"/>
+        <img className={classes.navIcon} src="/assets/img/logo.svg" alt="Cremería Gustavo"/>
         <Typography variant="h6" className={classes.navText} noWrap>
           Lista de Precios
         </Typography>
