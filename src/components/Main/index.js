@@ -112,7 +112,7 @@ export default function Main() {
       { title: 'Descripción', field: 'description', editable: 'always' },
       { title: 'Precio', field: 'price', type: 'currency', editable: 'always' },
     ];
-  const { products, setProducts } = useStore();
+  const { products } = useStore();
 
   useEffect(() => {
     localStorage.setItem('Products', products);
@@ -138,13 +138,7 @@ export default function Main() {
           onRowAdd: (newData) =>
             new Promise((resolve) => {
               setTimeout(() => {
-                addProduct(newData.name, newData.description, newData.price).then(products => 
-                    products.forEach(product => 
-                      setProducts(prev => 
-                        [...prev, product]
-                      )
-                    )
-                  );
+                addProduct(newData.name, newData.description, newData.price);
                 resolve();
               }, 600);
             }),
@@ -152,14 +146,7 @@ export default function Main() {
               new Promise((resolve) => {
                 setTimeout(() => {
                   if (oldData) {
-                    updateProduct(oldData.id, newData.name, newData.description, newData.price).then(products => 
-                      products.forEach(product => 
-                        setProducts(prev => {
-                          prev[prev.indexOf(oldData)] = product;
-                          return prev;
-                        })
-                      )
-                    )
+                    updateProduct(oldData.id, newData.name, newData.description, newData.price);
                   }
                   resolve();
                 }, 600);
@@ -167,15 +154,7 @@ export default function Main() {
             onRowDelete: (oldData) =>
               new Promise((resolve) => {
                 setTimeout(() => {
-                  deleteProduct(oldData.id).then(products => 
-                    products.forEach(product => 
-                      setProducts(prev => 
-                        prev.filter(value => 
-                          value.id !== product.id
-                        )
-                      )
-                    )
-                  );
+                  deleteProduct(oldData.id);
                   resolve();
                 }, 600);
               }),
