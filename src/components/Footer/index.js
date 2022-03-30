@@ -13,7 +13,6 @@ const styles = makeStyles((theme) =>
           backgroundColor: theme.palette.primary.main,
         },
         footer: {
-          paddingTop: `${theme.spacing(1) * 5}px`,
           position: 'absolute',
           bottom: 0,
           width: '100%',

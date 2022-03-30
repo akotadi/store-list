@@ -91,6 +91,7 @@ toolbar: {
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
     paddingTop: `${theme.spacing(1) * 5}px`,
+    paddingBottom: `${theme.spacing(1) * 5}px`,
   },
   formContainer: {
     paddingTop: `${theme.spacing(1) * 5}px`,
@@ -122,59 +123,59 @@ export default function Main() {
 
   return (
     <main>
-    <Container className={classes.tableContainer}>
-      <MaterialTable
-        title="Productos"
-        columns={columns}
-        data={products}
-        icons={tableIcons}
-        localization={localization}
-        options={{
-          paging: false,
-          maxBodyHeight: '65vh',
-          actionsColumnIndex: -1
-        }}
-        editable={{
-          onRowAdd: (newData) =>
-            new Promise((resolve) => {
-              setTimeout(() => {
-                if(!navigator.onLine){
-                  const newProduct = createProduct(newData.name, newData.description, newData.price);
-                  setProducts((prev) => [...prev, newProduct]);
-                }else{
-                  addProduct(newData.name, newData.description, newData.price).then(product => console.log(product));
-                }
-                resolve();
-              }, 600);
-            }),
-            onRowUpdate: (newData, oldData) =>
-              new Promise((resolve) => {
-                setTimeout(() => {
-                  if (oldData) {
-                    if(!navigator.onLine){
-                      const newProduct = createProduct(newData.name, newData.description, newData.price, oldData.id);
-                      setProducts((prev) => prev.map(product => product.id === oldData.id ? newProduct : product));
-                    }else{
-                      updateProduct(oldData.id, newData.name, newData.description, newData.price).then(product => console.log(product));
-                    }
-                  }
-                  resolve();
-                }, 600);
-              }),
-            onRowDelete: (oldData) =>
+      <Container className={classes.tableContainer}>
+        <MaterialTable
+          title="Productos"
+          columns={columns}
+          data={products}
+          icons={tableIcons}
+          localization={localization}
+          options={{
+            paging: false,
+            maxBodyHeight: '65vh',
+            actionsColumnIndex: -1
+          }}
+          editable={{
+            onRowAdd: (newData) =>
               new Promise((resolve) => {
                 setTimeout(() => {
                   if(!navigator.onLine){
-                    setProducts(setProducts((prev) => prev.filter(product => product.id !== oldData.id)));
+                    const newProduct = createProduct(newData.name, newData.description, newData.price);
+                    setProducts((prev) => [...prev, newProduct]);
                   }else{
-                    deleteProduct(oldData.id);
+                    addProduct(newData.name, newData.description, newData.price).then(product => console.log(product));
                   }
                   resolve();
                 }, 600);
               }),
-        }}
-      />
-    </Container>
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve) => {
+                  setTimeout(() => {
+                    if (oldData) {
+                      if(!navigator.onLine){
+                        const newProduct = createProduct(newData.name, newData.description, newData.price, oldData.id);
+                        setProducts((prev) => prev.map(product => product.id === oldData.id ? newProduct : product));
+                      }else{
+                        updateProduct(oldData.id, newData.name, newData.description, newData.price).then(product => console.log(product));
+                      }
+                    }
+                    resolve();
+                  }, 600);
+                }),
+              onRowDelete: (oldData) =>
+                new Promise((resolve) => {
+                  setTimeout(() => {
+                    if(!navigator.onLine){
+                      setProducts(setProducts((prev) => prev.filter(product => product.id !== oldData.id)));
+                    }else{
+                      deleteProduct(oldData.id);
+                    }
+                    resolve();
+                  }, 600);
+                }),
+          }}
+        />
+      </Container>
     </main>
   )
 }
